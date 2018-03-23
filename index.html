@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>CindyJS Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <style>
+    html, body { width: 100%; height: 100%; margin: 0; padding: 0; font-family: sans-serif;}
+    header { font-size: 24px; background: #242436; padding: 5px 30px; color: white; }
+    #content { display: flex; flex-direction: row; width: 100%; height: 100%; }
+    #canvas { width: 50%; }
+    #code { width: 50%; border-left: 1px solid #242436; display: flex; flex-direction: column; }
+    #code textarea { margin: 30px; flex-grow: 1; font-family: monospace; border: none; width: calc(100% - 60px); font-size: 14px; }
+    #code p { margin: 0 30px 20px 30px; }
+    #code button { padding: 6px 20px; font-size: 16px; color: white; border: none; background: #242436; border-radius: 4px; }
+  </style>
+
+</head>
+<body onload="parse()">
+
+  <script type="text/javascript" src="cindy.js"></script>
+  <script type="text/javascript">
+    var cdy = CindyJS({
+      canvasname: 'canvas',
+      defaultAppearance: {pointColor: [1,0.7,0]},
+      scripts: "cs*",
+      geometry: [
+        {name:"A", kind:"P", type:"Free", pos:[0,0,1]},
+        {name:"B", kind:"P", type:"Free", pos:[0,9,1]}
+      ]
+    });
+
+    function parse() {
+      var code = document.querySelector("#code textarea").value.replace('\n', ' ');
+      cdy.evokeCS('a():=(' + code + ')');
+    }
+  </script>
+
+  <div id="content">
+    <div id="canvas"></div>
+
+    <script id='csdraw' type='text/x-cindyscript'>a();</script>
+    <script id='csinit' type='text/x-cindyscript'></script>
+
+    <div id="code">
+      <header>CindyJS Demo for Imaginary</header>
+      <textarea id="code" rows="38" cols="50">
+repeat(500,i,
+       w=i*pi/180*(137.508+B.x*0.5);
+       p=A+(cos(w),sin(w))*0.3*sqrt(i);
+       a=i;
+       draw(p,size->sqrt(i)*.4,color->hue(i/34));
+       );
+      </textarea>
+      <p><button type="button" onclick="parse()">Run</button></p>
+    </div>
+  </div>
+
+</body>
+</html>
