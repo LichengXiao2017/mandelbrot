@@ -1,10 +1,9 @@
+// TODO:
+// Zoom
+// Change colours and iteration count
+// Better styles, resizing, and performance
 
-// nicer styles + resize events
-// better colours and iteration count
-// cleanup + performance
-
-
-const resolution = 400;
+let resolution = 400;
 
 const $mandelbrot = document.querySelector('#mandelbrot');
 const mandelContext = $mandelbrot.getContext('2d');
@@ -13,7 +12,6 @@ const mandelBounds = [-2, 1, -1.5, 1.5];
 const $julia = document.querySelector('#julia');
 const juliaContext = $julia.getContext('2d');
 const juliaBounds = [-1.5, 1.5, -1.5, 1.5];
-
 
 let running = false;
 function generateFractal(...options) {
@@ -30,22 +28,20 @@ function generateFractal(...options) {
   });
 }
 
-
-
 function paintFractal(data, context) {
-  const image = context.createImageData(resolution, resolution);
-  for (let x = 0; x < resolution; x += 1) {
-    for (let y = 0; y < resolution; y += 1) {
-      image.data.set(getColour(data[x][y]), (y * resolution + x) * 4);
+  const image = context.createImageData(data[0].length, data[0].length);
+  for (let x = 0; x < data[0].length; x += 1) {
+    for (let y = 0; y < data[0].length; y += 1) {
+      image.data.set(getColour(data[x][y]), (y * data[0].length + x) * 4);
     }
   }
   context.putImageData(image, 0, 0);   
 }
 
-
 const gradient = [0, 8, 12, 16, 20, 24, 28, 32, 36, 41];
-const colours = [[0,0,70], [130, 215, 255], [255,255,255], [255, 190, 0], [190, 0, 0],
-    [0, 0, 130], [130, 215, 255], [255,255,255], [255,190,0], [190,0,0]];
+const colours = [[0,0,70], [130, 215, 255], [255,255,255], [255, 190, 0],
+    [190, 0, 0], [0, 0, 130], [130, 215, 255], [255,255,255], [255,190,0],
+    [190,0,0]];
 
 function getColour(c) {
   if (!c) return [0, 0, 0, 255];
@@ -60,16 +56,6 @@ function getColour(c) {
     255
   ];
 }
-
-/*$mandelbrot.addEventListener('click', e => {
-  const rect = $mandelbrot.getBoundingClientRect();
-  const x = mandelBounds[0] + (e.clientX - rect.left) / rect.width * (mandelBounds[1] - mandelBounds[0]);
-  const y = mandelBounds[2] + (e.clientY - rect.top) / rect.height * (mandelBounds[3] - mandelBounds[2]);
-
-  generateFractal(...juliaBounds, resolution, [x, y]).then(data => paintFractal(data, juliaContext));
-});*/
-
-generateFractal(...mandelBounds, resolution).then(data => paintFractal(data, mandelContext));
 
 // ----------------------------------------------------------------------------
 
@@ -94,7 +80,8 @@ function move(e) {
   const py = mandelBounds[2] + (x - rect.top) / rect.height * (mandelBounds[3] - mandelBounds[2]);
 
   generateFractal(...juliaBounds, resolution, [px, py])
-    .then(data => paintFractal(data, juliaContext));
+    .then(data => paintFractal(data, juliaContext))
+    .catch();  // Promise is rejected if we are already renderinga new fractal.
 }
 
 function end(e) {
@@ -106,4 +93,21 @@ function end(e) {
 
 $knob.addEventListener('mousedown', start);
 $knob.addEventListener('touchstart', start);
+
+// ----------------------------------------------------------------------------
+
+function resize() {
+  resolution = $mandelbrot.offsetWidth;
+  $mandelbrot.width = resolution * 2;
+  $mandelbrot.height = resolution * 2;
+  generateFractal(...mandelBounds, resolution * 2)
+    .then(data => paintFractal(data, mandelContext))
+    .catch();
+
+  $julia.width = resolution;
+  $julia.height = resolution;
+}
+
+resize();
+window.addEventListener('resize', resize);
 

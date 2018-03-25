@@ -1,33 +1,22 @@
+const maxEscape = 40;
+const maxSquare = 16;
 
-/* function getColour(cx, cy, x0=0, y0=0, max=512) {
-  let x = x0;
-  let y = y0;
-  let iteration = 0;
-
-  while (true) {
-    iteration += 1;
-    if (iteration > max) return 0;
-
-    [x, y] = [x*x - y*y + cx, 2*x*y + cy];
-    if (x*x + y*y >= 4) return iteration;
-  }
-} */
-
-
-function getColour(cx, cy, x0=0, y0=0, max=40) {
+function getColour(cx, cy, x0=0, y0=0) {
   let x = x0;
   let y = y0;
   let escape = 0;
 
   while (true) {
-    if (escape > max) return 0;
+    if (escape > maxEscape) return 0;
 
-    let abs = Math.sqrt(x*x + y*y);
-    if (abs >= 4) return escape;
+    let squares = x * x + y * y;
+    if (squares >= maxSquare) return escape;
 
     [x, y] = [x*x - y*y + cx, 2*x*y + cy];
-    let abs1 = Math.sqrt(x*x + y*y);
-    escape += (abs1 <= 4) ? 1 : Math.log(4/abs) / Math.log(abs1/abs);
+
+    let squares1 = x * x + y * y;
+    escape += (squares1 <= maxSquare) ? 1 :
+        Math.log(maxSquare/squares) / Math.log(squares1/squares);
   }
 }
 
